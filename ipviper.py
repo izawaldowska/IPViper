@@ -6,13 +6,14 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from datetime import datetime
 
-# === Load API keys from config.json ===
-with open("config.json") as config_file:
-    config = json.load(config_file)
+from dotenv import load_dotenv
+import os
 
-VT_API_KEY = config["VT_API_KEY"]
-ABUSEIPDB_API_KEY = config["ABUSEIPDB_API_KEY"]
-IPINFO_TOKEN = config["IPINFO_TOKEN"]
+load_dotenv()  # load .env file
+
+VT_API_KEY = os.getenv("VT_API_KEY")
+ABUSEIPDB_API_KEY = os.getenv("ABUSEIPDB_API_KEY")
+IPINFO_TOKEN = os.getenv("IPINFO_TOKEN")
 
 def is_result_valid(text):
     return not text.strip().startswith("🔴") and len(text.strip()) > 0
