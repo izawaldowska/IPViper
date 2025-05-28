@@ -1,5 +1,6 @@
 import requests
 import json
+import certifi
 import ipaddress  # ← for IP validation
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
@@ -33,7 +34,7 @@ def get_user_ip():
 def get_virustotal(ip):
     url = f"https://www.virustotal.com/api/v3/ip_addresses/{ip}"
     headers = {"x-apikey": VT_API_KEY}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, verify=certifi.where())
     if response.status_code != 200:
         return "🔴 VirusTotal: This IP has not been found.\n"
 
@@ -41,11 +42,11 @@ def get_virustotal(ip):
     attributes = data.get("attributes", {})
     stats = attributes.get("last_analysis_stats", {})
     comments_url = f"https://www.virustotal.com/api/v3/ip_addresses/{ip}/comments?limit=10"
-    comments_resp = requests.get(comments_url, headers=headers).json()
+    comments_resp = requests.get(comments_url, headers=headers, verify=certifi.where()).json()
     comments_text = [c['attributes']['text'] for c in comments_resp.get('data', [])]
 
     resolutions_url = f"https://www.virustotal.com/api/v3/ip_addresses/{ip}/resolutions?limit=10"
-    resolutions_resp = requests.get(resolutions_url, headers=headers).json()
+    resolutions_resp = requests.get(resolutions_url, headers=headers, verify=certifi.where()).json()
     resolutions = resolutions_resp.get("data", [])
     resolution_lines = [
         f"{r['attributes']['host_name']} (last resolved: {r['attributes']['date']})"
@@ -69,7 +70,7 @@ def get_virustotal(ip):
 def get_abuseipdb(ip):
     url = f"https://api.abuseipdb.com/api/v2/check?ipAddress={ip}&verbose=true"
     headers = {"Key": ABUSEIPDB_API_KEY, "Accept": "application/json"}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, verify=certifi.where())
     if response.status_code != 200:
         return "🔴 AbuseIPDB: This IP has not been found.\n"
 
@@ -96,7 +97,7 @@ def get_abuseipdb(ip):
 
 def get_ipinfo(ip):
     url = f"https://ipinfo.io/{ip}?token={IPINFO_TOKEN}"
-    response = requests.get(url)
+    response = requests.get(url, verify=certifi.where())
     if response.status_code != 200:
         return "🔴 IPInfo: This IP has not been found.\n"
 
